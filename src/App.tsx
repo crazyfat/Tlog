@@ -1,13 +1,25 @@
-import { useDraggable } from '@neodrag/react'
 import type { DragOptions } from '@neodrag/react'
 import { useEffect, useRef, useState } from 'react'
-import { BottomBar, CommandNotFound, Help, NoSuchFileOrDirectory, Row, TrafficLight } from './components'
+import { reqLogInfo, reqMenu } from './api'
+import { CommandNotFound, Help, NoSuchFileOrDirectory, Row } from './cmpts/components'
 import { getStorage, key, setStorage } from './utils'
 import { FolderSystem } from './mock'
+import {Menu} from "lucide-react";
 
 interface CommandList {
   [key: string]:
   { (): void } | { (arg: string): void }
+}
+interface Log {
+  lid: string | undefined
+  summary: string | undefined
+  time: string | undefined
+}
+interface MEnu {
+  mid: string
+  name: string
+  des: string
+  children: MEnu[] | undefined
 }
 interface FolderSysteamType {
   id: number
@@ -21,6 +33,9 @@ const CURRENTFOLDERID = 'currentFolderId'
 const CURRENTCHILDIDS = 'currentChildIds'
 const CURRENTDIRECTORY = 'currentDirectory'
 function App() {
+  const [menuList, setMenuList] = useState<MEnu[]>([])
+  const [logList, setLogList] = useState<Log[]>([])
+  const [curTime, setCurTime] = useState('')
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [changeCount, setChangeCount] = useState<number>(0)
   const [currentId, setCurrentId] = useState<number>(0)
@@ -28,9 +43,6 @@ function App() {
   const [folderSysteam, setFolderSysteam] = useState(new Map(Object.entries(FolderSystem)))
   const [currentFolderId, setCurrentFolderId] = useState(0)
   const [currentDirectory, setCurrentDirectory] = useState<string>('')
-
-  const draggableRef = useRef(null)
-
   const [content, setContent] = useState<JSX.Element[]>(
     [<Row
       id={0}
@@ -39,21 +51,15 @@ function App() {
     />,
     ])
 
-  // 初始化 dragable 拖拽设置
-  const options: DragOptions = {
-    position,
-    onDrag: ({ offsetX, offsetY }) => setPosition({ x: offsetX, y: offsetY }),
-    bounds: { bottom: -500, top: 32, left: -600, right: -600 },
-    handle: '.window-header',
-    cancel: '.traffic-lights',
-  }
-  useDraggable(draggableRef, options)
-
   // 初始化
   useEffect(() => {
     setCurrentId(0)
     setCurrentDirectory('')
     setCurrentFolderId(0)
+    const tempTime = new Date()
+    setCurTime(tempTime.toString().split(' ').slice(0, 5).join(' '))
+    reqLogInfo().then((value) => { setLogList(value.data) })
+    reqMenu().then((value) => { setMenuList(value.data); console.log(menuList) })
   }, [])
   useEffect(() => {
     setStorage(CURRENTID, currentId)
@@ -260,30 +266,47 @@ function App() {
       }, 100)
     }
   }
-
   return (
-    <div ref={draggableRef} className='relative w-[700px] h-[500px] flex flex-col' >
-    <div className='absolute w-full top-2 window-header'>
-      <TrafficLight />
-    </div>
-    <div
-      className="flex flex-col p-4 pr-[5px] h-full text-white bg-[#1C1C1E]/95 rounded-lg"
-      style={{ fontFamily: 'Menlo, monospace', fontSize: '14px' }}
-    >
-      <div className="h-6 rounded-lg"></div>
-      <div className="flex flex-col flex-1 w-full mb-2 overflow-y-scroll scrollbar">
-        <div>Welcome to Terminal,type `help` to get started,have fun!</div>
+    <div style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}>
+      <div className='relative w-[1500px] h-[1000px] flex flex-col mt-6' >
+        {/* <div className='absolute w-full top-2 window-header'> */}
+        {/*  <TrafficLight /> */}
+        {/* </div> */}
         <div
-          className='flex-1 w-full'
+            className="flex flex-col p-4 pr-[5px] h-full text-white bg-[#000] "
+            style={{ fontSize: '15px' }}
         >
-          {...content}
+          <div className="flex flex-col flex-1 w-full mb-2 overflow-y-scroll scrollbar">
+            <div>Design based on React 18.2.0</div>
+            <br/>
+            <div>Welcome to Tlog! Type `help` to get started. </div>
+            <br/>
+            <div>Here is the updating log:</div>
+            <br/>
+            {logList.map(log => (
+                <div key={log.lid}> * {log.summary}{log.time}</div>
+            ))}
+            <br/>
+            <div>Current visit: {curTime} from 0.0.0.0
+            </div>
+            <div
+                className='flex-1 w-full'
+            >
+              {...content}
+            </div>
+          </div>
         </div>
+        {/* <div className='absolute bottom-0 w-full '> */}
+        {/*  <BottomBar/> */}
+        {/* </div> */}
       </div>
     </div>
-    <div className='absolute bottom-0 w-full '>
-      <BottomBar/>
-    </div>
-  </div>
   )
 }
 

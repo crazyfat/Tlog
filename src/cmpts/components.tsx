@@ -1,6 +1,6 @@
 import React from 'react'
 import { Minimize2, Minus, X } from 'lucide-react'
-
+// import TerminalCursor from "./cursor";
 interface RowProps {
   id: number
   onkeydown: (e: React.KeyboardEvent<HTMLInputElement>) => void
@@ -9,15 +9,14 @@ const Row: React.FC<RowProps> = ({ id, onkeydown }) => {
   const currentId = Number.parseInt(JSON.parse(localStorage.getItem('currentId') as string))
   const dir = localStorage.getItem('currentDirectory')
   return (
-    <div className='flex flex-col w-full h-12'>
-      <div>
-        <span className="mr-2 text-yellow-400">funnycoder</span>
-        <span className="mr-2 text-green-400">@macbook-pro</span>
-        <span className="mr-2 text-blue-400">~{dir}</span>
-        <span id={`terminal-currentDirectory-${id}`} className="mr-2 text-blue-400"></span>
-      </div>
+    <div className='flex flex-col w-full h-6'>
+      {/* <div> */}
+      {/*  <span className="mr-2 text-yellow-400"></span> */}
+      {/*  <span id={`terminal-currentDirectory-${id}`} className="mr-2 text-blue-400"></span> */}
+      {/* </div> */}
       <div className='flex'>
-        <span className="mr-2 text-pink-400">$</span>
+        <span >[visitor@Tlog ~{dir}]#</span>
+         {/*<TerminalCursor/>*/}
         <input
           type="text"
           id={`terminal-input-${id}`}

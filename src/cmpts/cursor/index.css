@@ -1,0 +1,24 @@
+.terminal-cursor {
+    display: inline-block;
+    width: 10px;
+    height: 20px;
+    background-color: white; /* 光标的颜色 */
+    animation: cursor-blink 1s infinite; /* 光标闪烁动画 */
+}
+
+@keyframes cursor-blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+.visible {
+    opacity: 1;
+}
+
+.hidden {
+    opacity: 0;
+}

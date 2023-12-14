@@ -19,10 +19,10 @@ export const FolderSystem = {
   },
   3: {
     id: 3,
-    title: 'about.md',
+    title: 'readme.md',
     content: <ul>
-    <li>👋 Hi, I’m @ljq0226</li>
-    <li>📫 Contact me: luorom001@gmail.com</li>
+    <li>👋 Hi, I’m zhangyq</li>
+    <li>📫 Contact me: 1325812043@qq.com</li>
     <li></li>
     </ul>,
     parentId: 0,
