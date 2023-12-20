@@ -41,46 +41,47 @@ export default [
       return {
         code: '200',
         data: {
-          level: 0,
-          menuList: [
+          mid: 0,
+          name: '~',
+          children: [
             {
-              mid: '001',
+              mid: 1,
               name: 'linux',
               des: 'linux运维相关知识点',
               children: [],
             },
             {
-              mid: '02',
+              mid: 2,
               name: 'scientificResearch',
               des: '科研过程笔记',
               children: [],
             },
             {
-              mid: '003',
+              mid: 3,
               name: 'recommendationSystem',
               des: '推荐系统相关',
               children: [],
             },
             {
-              mid: '004',
+              mid: 4,
               name: 'frontEndLearning',
               des: '前端学习知识',
               children: [],
             },
             {
-              mid: '05',
+              mid: 5,
               name: 'algorithmRecording',
               des: '算法记录笔记',
               children: [],
             },
             {
-              mid: '006',
+              mid: 6,
               name: 'autumnRecruitmentSummary',
               des: '前端学习知识',
               children: [],
             },
             {
-              mid: '007',
+              mid: 7,
               name: 'internshipExperience',
               des: '实习经历',
               children: [],

@@ -1,10 +1,13 @@
-import type { DragOptions } from '@neodrag/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { reqLogInfo, reqMenu } from './api'
 import { CommandNotFound, Help, NoSuchFileOrDirectory, Row } from './cmpts/components'
 import { getStorage, key, setStorage } from './utils'
 import { FolderSystem } from './mock'
-import {Menu} from "lucide-react";
+import { addMenu } from './redux/actions/menu'
+import {popPwd, pushPwd} from "./redux/actions/pwd";
+import pwd from "./redux/reducer/pwd";
+import redux from "./redux";
 
 interface CommandList {
   [key: string]:
@@ -50,7 +53,15 @@ function App() {
       onkeydown={(e: React.KeyboardEvent<HTMLInputElement>) => executeCommand(e, 0)}
     />,
     ])
-
+  // redux数据
+  const pwdInfo = useSelector((state) => {
+    return state.pwdReducer
+  })
+  const menuInfo = useSelector((state) => {
+    return state.menuReducer
+  })
+  const numb = useSelector(state=>state.countReducer)
+  const dispatch = useDispatch()
   // 初始化
   useEffect(() => {
     setCurrentId(0)
@@ -59,8 +70,8 @@ function App() {
     const tempTime = new Date()
     setCurTime(tempTime.toString().split(' ').slice(0, 5).join(' '))
     reqLogInfo().then((value) => { setLogList(value.data) })
-    reqMenu().then((value) => { setMenuList(value.data); console.log(menuList) })
   }, [])
+  useEffect(() => { setMenuList({})}, [menuInfo, pwdInfo])
   useEffect(() => {
     setStorage(CURRENTID, currentId)
   }, [currentId])
@@ -141,8 +152,30 @@ function App() {
     const input = document.querySelector('#terminal-input-0') as HTMLInputElement
     input.value = ''
   }
+  const onInce = ()=>{
+    dispatch(pushPwd({ids:2, path: 'hio'}))
+    console.log('onInce:',pwdInfo)
+  }
   // ls 命令
-  const ls = () => {
+  const ls = async () => {
+    // 当前位置为：pwd.ids[pwd.ids.length-1]
+    const curIds = pwdInfo[pwdInfo.ids[pwdInfo.ids.length - 1]]
+    onInce()
+    //dispatch(pushPwd({id:1, path:'fjsjdf'}))
+    console.log('pwdInfo in',pwdInfo)
+    let childrenInfo: MEnu[] = []
+    if (menuInfo.hasOwnProperty(curIds)) {
+      console.log('from redux')
+      childrenInfo = menuInfo.curIds.children
+    }
+    else {
+      console.log('from request')
+      // 此处存入redux
+      await reqMenu().then((res) => {
+        //dispatch(addMenu(res.data))
+        childrenInfo = res.data.children
+      })
+    }
     let res = ''
     // 获取当前目录下所有子目录 id
     const ids = getStorage(CURRENTCHILDIDS)
@@ -249,6 +282,7 @@ function App() {
       newArr.push(input.value.trim())
       setCommandHistory(newArr)
       // 如果输入 command 符合就执行
+      console.log('exe中',pwdInfo)
       if (cmd && Object.keys(commandList).includes(cmd))
         commandList[cmd](args)
       else if (cmd !== '')
@@ -288,7 +322,9 @@ function App() {
             <div>Welcome to Tlog! Type `help` to get started. </div>
             <br/>
             <div>Here is the updating log:</div>
-            <br/>
+            <button onClick={()=>dispatch({type: 'add'})} >cur num: {pwdInfo.ids}</button>
+            <button onClick={()=>dispatch({type: 'sub'})} >cur num: {numb.num}</button>
+            <button onClick={onInce}>cur pwd length {pwdInfo.ids.length}</button>
             {logList.map(log => (
                 <div key={log.lid}> * {log.summary}{log.time}</div>
             ))}
